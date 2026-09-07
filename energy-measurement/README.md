@@ -37,11 +37,15 @@ The project builds nothing in CI: the `Makefile` build targets (`Makefile:1,60`)
 are never invoked by the workflow. The `build` stage is therefore environment
 preparation, as in other Python projects of the study.
 
-Every command in `commands.sh` is literal. The only substitutions are the
-GitHub expressions the runner would expand (`matrix.python-version`,
-`matrix.python-impl`, `matrix.run-tests-ext`, and the `own-pip-versions` test that
-selects the get-pip URL) and the two `GITHUB_ENV` writes, which become `export`
-because a container has no `GITHUB_ENV`.
+Every command in `commands.sh` is literal. The differences against the workflow
+are these, and no others:
+
+| # | difference | why |
+|---|---|---|
+| - | GitHub expressions expanded (`matrix.python-version`, `matrix.python-impl`, `matrix.run-tests-ext`, the `own-pip-versions` test that selects the get-pip URL) | the runner expands them; the measured cell fixes them |
+| - | the two `GITHUB_ENV` writes become `export` | a container has no `GITHUB_ENV` |
+| D-7 | the `build` stage installs into a throwaway virtualenv | each stage runs in its own `--rm` container, so the image carries the runner for `test`; without a fresh environment `pip show` would short-circuit the literal install |
+| D-8 | the two `echo "$PYTHONHOME"` lines are omitted (`ci.yml:363`, `ci.yml:412`) | `PYTHONHOME` is produced by `Locate supported Python` (`ci.yml:169-200`), a runner-setup step outside the measured construct; the interpreter comes from the base image instead. Setting it in the container would override `sys.prefix` and defeat D-7. Energy effect: none, two `echo` lines |
 
 ## Running
 

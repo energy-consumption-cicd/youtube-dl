@@ -25,7 +25,7 @@ case "$STAGE" in
     . /tmp/venv-build/bin/activate
 
     echo "$PATH"
-    echo "$PYTHONHOME"
+    # ci.yml:363 echo of PYTHONHOME omitted: variable set by an excluded runner step (D-8)
     # curl is available on both Windows and Linux, -L follows redirects, -O gets name
     # get_pip is empty for 3.11: own-pip-versions covers 2.6 to 3.6 only (ci.yml:103),
     # and ensurepip succeeds here, so the curl branch is never taken.
@@ -35,7 +35,7 @@ case "$STAGE" in
       python get-pip.py --no-setuptools --no-wheel; }
 
     echo "$PATH"
-    echo "$PYTHONHOME"
+    # ci.yml:412 echo of PYTHONHOME omitted: variable set by an excluded runner step (D-8)
     # Use PyNose for recent Pythons instead of Nose
     py3ver="$PYTHON_VERSION"
     py3ver=${py3ver#3.}
